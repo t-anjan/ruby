@@ -29,6 +29,7 @@ RUN set -ex \
 		gcc \
 		gdbm-dev \
 		glib-dev \
+		jemalloc-dev \
 		libc-dev \
 		libffi-dev \
 		libressl \
@@ -80,6 +81,7 @@ RUN set -ex \
 		--build="$gnuArch" \
 		--disable-install-doc \
 		--enable-shared \
+		--with-jemalloc \
 	&& make -j "$(nproc)" \
 	&& make install \
 	\
@@ -103,6 +105,8 @@ RUN set -ex \
 	&& gem update --system "$RUBYGEMS_VERSION" \
 	&& gem install bundler --version "$BUNDLER_VERSION" --force \
 	&& rm -r /root/.gem/
+
+RUN ruby -r rbconfig -e "RbConfig::CONFIG['LIBS'].include?('jemalloc') ? puts('Ruby is compiled with jemalloc') : warn('JEMALLOC IS MISSING FROM RUBY')"
 
 # install things globally, for great justice
 # and don't create ".bundle" in all our apps
